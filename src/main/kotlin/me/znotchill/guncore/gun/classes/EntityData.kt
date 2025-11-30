@@ -1,4 +1,4 @@
-package gun.classes
+package me.znotchill.guncore.gun.classes
 
 import net.minestom.server.entity.LivingEntity
 

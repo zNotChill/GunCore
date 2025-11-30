@@ -1,4 +1,4 @@
-package gun.classes
+package me.znotchill.guncore.gun.classes
 
 import kotlinx.serialization.Serializable
 

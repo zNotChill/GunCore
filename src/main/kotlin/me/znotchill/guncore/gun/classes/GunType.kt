@@ -1,4 +1,4 @@
-package gun.classes
+package me.znotchill.guncore.gun.classes
 
 enum class GunType(val slot: Int) {
     PRIMARY(0),

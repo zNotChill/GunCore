@@ -1,4 +1,4 @@
-package gun.raycast
+package me.znotchill.guncore.gun.raycast
 
 import net.minestom.server.entity.EntityType
 

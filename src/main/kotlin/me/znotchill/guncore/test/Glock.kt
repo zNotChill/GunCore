@@ -1,7 +1,7 @@
-package test
+package me.znotchill.guncore.test
 
-import gun.Gun
-import me.znotchill.gun.classes.GunTrigger
+import me.znotchill.guncore.gun.Gun
+import me.znotchill.guncore.gun.classes.GunTrigger
 
 object GlockGun : Gun(
     id = "glock",

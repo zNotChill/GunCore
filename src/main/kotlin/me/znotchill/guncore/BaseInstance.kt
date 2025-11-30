@@ -1,4 +1,4 @@
-package me.znotchill
+package me.znotchill.guncore
 
 import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.instance.InstanceManager

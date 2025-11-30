@@ -1,9 +1,9 @@
-package gun
+package me.znotchill.guncore.gun
 
-import gun.LivingEntityUtils.getHeldGun
-import gun.classes.EntityData
-import gun.classes.GunTags
-import gun.classes.PhysicalGun
+import me.znotchill.guncore.gun.LivingEntityUtils.getHeldGun
+import me.znotchill.guncore.gun.classes.EntityData
+import me.znotchill.guncore.gun.classes.GunTags
+import me.znotchill.guncore.gun.classes.PhysicalGun
 import me.znotchill.blossom.extensions.addListener
 import me.znotchill.blossom.extensions.ticks
 import me.znotchill.blossom.scheduler.task

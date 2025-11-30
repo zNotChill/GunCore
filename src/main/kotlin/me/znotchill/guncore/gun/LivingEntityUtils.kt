@@ -1,10 +1,10 @@
-package gun
+package me.znotchill.guncore.gun
 
-import gun.classes.EntityData
-import gun.classes.PhysicalGun
+import me.znotchill.guncore.gun.classes.EntityData
+import me.znotchill.guncore.gun.classes.PhysicalGun
 import net.minestom.server.entity.LivingEntity
 import net.minestom.server.entity.PlayerHand
-import gun.classes.GunTags
+import me.znotchill.guncore.gun.classes.GunTags
 import net.minestom.server.entity.Player
 import net.minestom.server.entity.attribute.Attribute
 import java.util.UUID

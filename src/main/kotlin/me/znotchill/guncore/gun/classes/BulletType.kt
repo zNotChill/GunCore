@@ -1,4 +1,4 @@
-package me.znotchill.gun.classes
+package me.znotchill.guncore.gun.classes
 
 enum class BulletType {
     HITSCAN,

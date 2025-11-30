@@ -1,9 +1,9 @@
-package me.znotchill
+package me.znotchill.guncore
 
-import gun.GunCore
-import gun.LivingEntityUtils.gunData
-import gun.classes.GunTags
-import gun.classes.PhysicalGun
+import me.znotchill.guncore.gun.GunCore
+import me.znotchill.guncore.gun.LivingEntityUtils.gunData
+import me.znotchill.guncore.gun.classes.GunTags
+import me.znotchill.guncore.gun.classes.PhysicalGun
 import me.znotchill.blossom.command.command
 import me.znotchill.blossom.component.component
 import me.znotchill.blossom.extensions.addListener
@@ -15,12 +15,12 @@ import me.znotchill.blossom.server.essentials.classes.withConfig
 import me.znotchill.marmot.minestom.api.MarmotAPI
 import me.znotchill.marmot.minestom.api.extensions.configureMouse
 import me.znotchill.marmot.minestom.api.extensions.lockCamera
-import me.znotchill.test.SniperGun
+import me.znotchill.guncore.test.SniperGun
 import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerLoadedEvent
 import net.minestom.server.instance.InstanceContainer
-import test.GlockGun
+import me.znotchill.guncore.test.GlockGun
 import java.util.*
 
 class Server : BlossomServer(
@@ -87,7 +87,7 @@ class Server : BlossomServer(
         )
 
         registerCommand(
-            command("gun") {
+            command("me/znotchill/guncore/gunznotchill/guncore/gun") {
                 val id = argument<String>("id")
                 syntax(id) { idStr ->
                     val gun = GunCore.getGun(idStr) ?: return@syntax

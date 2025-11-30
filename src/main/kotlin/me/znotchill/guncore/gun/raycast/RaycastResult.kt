@@ -1,4 +1,4 @@
-package gun.raycast
+package me.znotchill.guncore.gun.raycast
 
 import me.znotchill.blossom.pos.SmallPos
 import net.minestom.server.coordinate.Pos

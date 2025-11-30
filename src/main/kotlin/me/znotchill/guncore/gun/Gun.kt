@@ -1,13 +1,13 @@
-package gun
+package me.znotchill.guncore.gun
 
-import gun.LivingEntityUtils.actualEyeHeight
-import gun.LivingEntityUtils.getHeldGun
-import gun.classes.GunTags
-import gun.classes.GunType
-import gun.classes.PhysicalGun
-import gun.raycast.RayTemplate
-import gun.raycast.RaycastEngine
-import gun.raycast.RaycastResult
+import me.znotchill.guncore.gun.LivingEntityUtils.actualEyeHeight
+import me.znotchill.guncore.gun.LivingEntityUtils.getHeldGun
+import me.znotchill.guncore.gun.classes.GunTags
+import me.znotchill.guncore.gun.classes.GunType
+import me.znotchill.guncore.gun.classes.PhysicalGun
+import me.znotchill.guncore.gun.raycast.RayTemplate
+import me.znotchill.guncore.gun.raycast.RaycastEngine
+import me.znotchill.guncore.gun.raycast.RaycastResult
 import kotlinx.serialization.Serializable
 import me.znotchill.blossom.component.component
 import me.znotchill.blossom.extensions.audience
@@ -15,8 +15,8 @@ import me.znotchill.blossom.extensions.playSounds
 import me.znotchill.blossom.extensions.ticks
 import me.znotchill.blossom.scheduler.task
 import me.znotchill.blossom.sound.sound
-import me.znotchill.gun.classes.BulletType
-import me.znotchill.gun.classes.GunTrigger
+import me.znotchill.guncore.gun.classes.BulletType
+import me.znotchill.guncore.gun.classes.GunTrigger
 import me.znotchill.marmot.common.classes.FovOp
 import me.znotchill.marmot.minestom.api.extensions.adjustCamera
 import net.kyori.adventure.audience.Audience
@@ -49,7 +49,7 @@ open class Gun(
 
     open var secondaryTrigger: GunTrigger = GunTrigger.RIGHT_CLICK,
 
-    /** The type of bullet to shoot (defaults to [me.znotchill.gun.classes.BulletType.HITSCAN]) */
+    /** The type of bullet to shoot (defaults to [BulletType.HITSCAN]) */
     open var bulletType: BulletType = BulletType.HITSCAN,
 
     /** The amount of health taken from a hit (defaults to 0) */

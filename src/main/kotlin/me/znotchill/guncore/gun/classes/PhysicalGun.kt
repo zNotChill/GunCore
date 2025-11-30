@@ -1,6 +1,6 @@
-package gun.classes
+package me.znotchill.guncore.gun.classes
 
-import gun.Gun
+import me.znotchill.guncore.gun.Gun
 import java.util.UUID
 
 /**
