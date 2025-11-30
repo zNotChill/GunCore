@@ -293,9 +293,10 @@ open class Gun(
         val heldGun = entity.getHeldGun() ?: return
         val ticksBetweenShots = 20 / fireRate
 
+        println(heldGun.shootingTicks)
         heldGun.shootingTicks += 1
         if ((heldGun.shootingTicks % ticksBetweenShots) == 0 ||
-            heldGun.shootingTicks == 0) {
+            heldGun.shootingTicks == 1) {
             heldGun.lastShotTick = heldGun.shootingTicks
             GunCore.announce("shot at ${heldGun.shootingTicks}")
 

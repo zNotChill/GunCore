@@ -87,7 +87,7 @@ class Server : BlossomServer(
         )
 
         registerCommand(
-            command("me/znotchill/guncore/gunznotchill/guncore/gun") {
+            command("gun") {
                 val id = argument<String>("id")
                 syntax(id) { idStr ->
                     val gun = GunCore.getGun(idStr) ?: return@syntax
