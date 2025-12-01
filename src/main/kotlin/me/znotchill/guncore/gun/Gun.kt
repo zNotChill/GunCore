@@ -1,22 +1,16 @@
 package me.znotchill.guncore.gun
 
-import me.znotchill.guncore.gun.LivingEntityUtils.actualEyeHeight
-import me.znotchill.guncore.gun.LivingEntityUtils.getHeldGun
-import me.znotchill.guncore.gun.classes.GunTags
-import me.znotchill.guncore.gun.classes.GunType
-import me.znotchill.guncore.gun.classes.PhysicalGun
-import me.znotchill.guncore.gun.raycast.RayTemplate
-import me.znotchill.guncore.gun.raycast.RaycastEngine
-import me.znotchill.guncore.gun.raycast.RaycastResult
 import kotlinx.serialization.Serializable
 import me.znotchill.blossom.component.component
 import me.znotchill.blossom.extensions.audience
 import me.znotchill.blossom.extensions.playSounds
-import me.znotchill.blossom.extensions.ticks
-import me.znotchill.blossom.scheduler.task
 import me.znotchill.blossom.sound.sound
-import me.znotchill.guncore.gun.classes.BulletType
-import me.znotchill.guncore.gun.classes.GunTrigger
+import me.znotchill.guncore.gun.LivingEntityUtils.actualEyeHeight
+import me.znotchill.guncore.gun.LivingEntityUtils.getPhysicalGun
+import me.znotchill.guncore.gun.classes.*
+import me.znotchill.guncore.gun.raycast.RayTemplate
+import me.znotchill.guncore.gun.raycast.RaycastEngine
+import me.znotchill.guncore.gun.raycast.RaycastResult
 import me.znotchill.marmot.common.classes.FovOp
 import me.znotchill.marmot.minestom.api.extensions.adjustCamera
 import net.kyori.adventure.audience.Audience
@@ -34,7 +28,7 @@ import net.minestom.server.item.Material
 import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle
 import net.minestom.server.timer.TaskSchedule
-import java.util.UUID
+import java.util.*
 import kotlin.math.pow
 
 @Serializable
@@ -45,9 +39,9 @@ open class Gun(
     /** The gun type (defaults to [GunType.PRIMARY]) */
     open var type: GunType = GunType.PRIMARY,
 
-    open var primaryTrigger: GunTrigger = GunTrigger.LEFT_CLICK,
+    open var primaryTrigger: GunTriggerInput = GunTriggerInput.LEFT_CLICK,
 
-    open var secondaryTrigger: GunTrigger = GunTrigger.RIGHT_CLICK,
+    open var secondaryTrigger: GunTriggerInput = GunTriggerInput.RIGHT_CLICK,
 
     /** The type of bullet to shoot (defaults to [BulletType.HITSCAN]) */
     open var bulletType: BulletType = BulletType.HITSCAN,
@@ -250,7 +244,7 @@ open class Gun(
                 // Technically this approach allows the player to
                 // swap to and from the reload and then swap back on the tick
                 // that this finishes, but it shouldn't be an issue for now lol
-                if (entity.getHeldGun() != physicalGun) {
+                if (entity.getPhysicalGun() != physicalGun) {
                     physicalGun.reloading = false
                     return@scheduleTask
                 }
@@ -271,34 +265,23 @@ open class Gun(
     }
 
     fun onPrimaryTriggerBegin(entity: LivingEntity) {
+        val heldGun = entity.getPhysicalGun() ?: return
+        if (heldGun.isPrimaryTriggered) return
+
         GunCore.announce("begin primary trigger")
-        val heldGun = entity.getHeldGun() ?: return
         heldGun.isPrimaryTriggered = true
         heldGun.lastShotTick = 0
         heldGun.shootingTicks = 0
-
-        GunCore.server.scheduler.task {
-            repeat = 1.ticks
-            run = { task ->
-                if (!heldGun.isPrimaryTriggered)
-                    task.cancel()
-                else {
-                    processPrimaryTriggerTick(entity)
-                }
-            }
-        }
     }
 
     fun processPrimaryTriggerTick(entity: LivingEntity) {
-        val heldGun = entity.getHeldGun() ?: return
+        val heldGun = entity.getPhysicalGun() ?: return
         val ticksBetweenShots = 20 / fireRate
 
-        println(heldGun.shootingTicks)
         heldGun.shootingTicks += 1
         if ((heldGun.shootingTicks % ticksBetweenShots) == 0 ||
             heldGun.shootingTicks == 1) {
             heldGun.lastShotTick = heldGun.shootingTicks
-            GunCore.announce("shot at ${heldGun.shootingTicks}")
 
             tryShoot(
                 entity.instance.players.audience,
@@ -308,17 +291,20 @@ open class Gun(
     }
 
     fun onPrimaryTriggerEnd(entity: LivingEntity) {
+        val heldGun = entity.getPhysicalGun() ?: return
+        if (!heldGun.isPrimaryTriggered) return
         GunCore.announce("end primary trigger")
-        val heldGun = entity.getHeldGun() ?: return
+
         heldGun.isPrimaryTriggered = false
         heldGun.lastShotTick = 0
         heldGun.shootingTicks = 0
     }
 
     fun onSecondaryTriggerBegin(entity: LivingEntity) {
-        println("begin secondary trigger")
+        val heldGun = entity.getPhysicalGun() ?: return
+        if (heldGun.isSecondaryTriggered) return
 
-        val heldGun = entity.getHeldGun() ?: return
+        println("begin secondary trigger")
         heldGun.isSecondaryTriggered = true
 
         if (entity is Player) {
@@ -333,9 +319,10 @@ open class Gun(
     }
 
     fun onSecondaryTriggerEnd(entity: LivingEntity) {
+        val heldGun = entity.getPhysicalGun() ?: return
+        if (!heldGun.isSecondaryTriggered) return
         println("end secondary trigger")
 
-        val heldGun = entity.getHeldGun() ?: return
         heldGun.isSecondaryTriggered = false
 
         if (entity is Player) {
@@ -413,7 +400,7 @@ open class Gun(
         audience: Audience? = null,
         shooter: LivingEntity
     ) {
-        val heldGun = shooter.getHeldGun() ?: return
+        val heldGun = shooter.getPhysicalGun() ?: return
         val pos = shooter.position
         val instance = shooter.instance
 

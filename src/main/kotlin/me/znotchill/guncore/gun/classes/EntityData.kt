@@ -12,4 +12,6 @@ data class EntityData(
 
     var isPrimaryTriggered: Boolean = false,
     var isSecondaryTriggered: Boolean = false,
+    var isLeftClicking: Boolean = false,
+    var isRightClicking: Boolean = false,
 )

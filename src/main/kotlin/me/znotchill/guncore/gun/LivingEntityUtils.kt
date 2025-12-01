@@ -7,17 +7,26 @@ import net.minestom.server.entity.PlayerHand
 import me.znotchill.guncore.gun.classes.GunTags
 import net.minestom.server.entity.Player
 import net.minestom.server.entity.attribute.Attribute
+import net.minestom.server.item.ItemStack
 import java.util.UUID
 
 object LivingEntityUtils {
-    fun LivingEntity.getHeldGun(hand: PlayerHand? = PlayerHand.MAIN): PhysicalGun? {
+    fun LivingEntity.getPhysicalGun(
+        hand: PlayerHand? = PlayerHand.MAIN,
+        slot: Int? = null
+    ): PhysicalGun? {
         var finalHand = PlayerHand.MAIN
         if (hand == null) {
             if (this is Player)
                 finalHand = this.itemUseHand ?: PlayerHand.MAIN
         }
 
-        val item = this.getItemInHand(finalHand)
+        var item: ItemStack= this.getItemInHand(finalHand)
+        if (slot != null) {
+            if (this is Player) {
+                item = this.inventory.getItemStack(slot)
+            }
+        }
 
         val isGun = item.hasTag(GunTags.IS_GUN)
         if (!isGun) return null

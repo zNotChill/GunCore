@@ -21,6 +21,7 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerLoadedEvent
 import net.minestom.server.instance.InstanceContainer
 import me.znotchill.guncore.test.GlockGun
+import me.znotchill.guncore.test.SMGGun
 import java.util.*
 
 class Server : BlossomServer(
@@ -48,6 +49,7 @@ class Server : BlossomServer(
         GunCore.init(this)
         GunCore.register(GlockGun)
         GunCore.register(SniperGun)
+        GunCore.register(SMGGun)
 
         instanceContainer = BaseInstance().createInstance(instanceManager)
 
