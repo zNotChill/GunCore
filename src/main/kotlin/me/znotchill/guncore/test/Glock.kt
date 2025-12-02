@@ -7,7 +7,8 @@ object GlockGun : Gun(
     id = "glock",
     primaryTrigger = GunTriggerInput.LEFT_CLICK,
     secondaryTrigger = GunTriggerInput.RIGHT_CLICK,
-    adsZoom = 20,
-    fireRate = 5,
-    spread = 0.0
+    fireRate = 5f,
+    hipfireSpread = 0.15,
+    adsSpread = 0.15,
+    adsZoom = 5,
 )

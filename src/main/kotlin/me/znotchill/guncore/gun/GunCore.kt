@@ -188,6 +188,20 @@ object GunCore {
                 return@buildTask
 
             heldGun.gun.processPrimaryTriggerTick(player)
+
+            if (player.gunData.isSecondaryTriggered) {
+                heldGun.scopeTicks++
+
+                // enter scoped mode after holding ADS for 10 ticks (0.5s)
+                if (!heldGun.isScoped && heldGun.scopeTicks >= 10) {
+                    heldGun.isScoped = true
+                }
+            } else {
+                // reset scoping
+                heldGun.wasScoped = heldGun.isScoped
+                heldGun.isScoped = false
+                heldGun.scopeTicks = 0
+            }
         }
             .repeat(TaskSchedule.tick(1))
             .schedule()

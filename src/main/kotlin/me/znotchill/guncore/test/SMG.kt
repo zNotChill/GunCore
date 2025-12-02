@@ -7,7 +7,9 @@ object SMGGun : Gun(
     id = "smg",
     primaryTrigger = GunTriggerInput.LEFT_CLICK,
     secondaryTrigger = GunTriggerInput.RIGHT_CLICK,
+    fireRate = 12f,
+
+    hipfireSpread = 0.06,
+    adsSpread = 0.04,
     adsZoom = 20,
-    fireRate = 12,
-    spread = 0.04
 )

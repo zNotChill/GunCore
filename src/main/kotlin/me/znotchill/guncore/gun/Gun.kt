@@ -39,9 +39,25 @@ open class Gun(
     /** The gun type (defaults to [GunType.PRIMARY]) */
     open var type: GunType = GunType.PRIMARY,
 
+    /**
+     * The [GunTriggerInput] to use for the gun's primary trigger.
+     */
     open var primaryTrigger: GunTriggerInput = GunTriggerInput.LEFT_CLICK,
 
+    /**
+     * The [GunTriggerInput] to use for the gun's secondary trigger.
+     */
     open var secondaryTrigger: GunTriggerInput = GunTriggerInput.RIGHT_CLICK,
+
+    /**
+     * The [GunAction] to use for the gun's primary trigger.
+     */
+    open var primaryAction: GunAction = GunAction.SHOOT,
+
+    /**
+     * The [GunAction] to use for the gun's secondary trigger.
+     */
+    open var secondaryAction: GunAction = GunAction.ADS,
 
     /** The type of bullet to shoot (defaults to [BulletType.HITSCAN]) */
     open var bulletType: BulletType = BulletType.HITSCAN,
@@ -50,7 +66,7 @@ open class Gun(
     open var damagePerShot: Int = 0,
 
     /** How many times the gun shoots per second (defaults to 0) */
-    open var fireRate: Int = 5,
+    open var fireRate: Float = 5f,
 
     /** The number of bullets in the gun's magazine (defaults to 0) */
     open var magazineSize: Int = 0,
@@ -70,9 +86,6 @@ open class Gun(
      * (defaults to 0.1)
      */
     open var damageDropOffMultiplier: Double = 0.1,
-
-    /** Deviation from the intended aim spot in blocks (defaults to 0.2) */
-    open var spread: Double = 0.2,
 
     /**
      * The speed at which projectiles travel (only applies to projectile-based weapons).
@@ -195,6 +208,31 @@ open class Gun(
      * The amount of FOV to zoom in when the player ADS'.
      */
     open var adsZoom: Int = 5,
+    open var adsZoomTicks: Int = 15,
+
+    /**
+     * Deviation from the intended aim spot in blocks (defaults to 0.2)
+     * Aim Down Sights spread
+     * */
+    open var adsSpread: Double = 0.2,
+
+    /**
+     * Deviation from the intended aim spot in blocks (defaults to 0.2)
+     * Hipfire spread
+     * */
+    open var hipfireSpread: Double = 0.2,
+
+    /**
+     * The amount of FOV to zoom in when the player scopes in.
+     */
+    open var scopedZoom: Int = 15,
+    open var scopedZoomTicks: Int = 15,
+
+    /**
+     * Deviation from the intended aim spot in blocks (defaults to 0.2)
+     * Fully scoped spread
+     * */
+    open var scopedSpread: Double = 0.2,
 ) {
     fun createFinalItem(): ItemStack {
         var item = this.item
@@ -216,7 +254,6 @@ open class Gun(
 
         return item
     }
-
 
     /**
      * Attempt to reload the [LivingEntity]'s held [PhysicalGun].
@@ -272,14 +309,31 @@ open class Gun(
         heldGun.isPrimaryTriggered = true
         heldGun.lastShotTick = 0
         heldGun.shootingTicks = 0
+
+        when (primaryAction) {
+            GunAction.ADS, GunAction.SCOPE -> {
+                if (entity is Player)
+                    processZoomBegin(entity)
+            }
+            else -> {}
+        }
     }
 
     fun processPrimaryTriggerTick(entity: LivingEntity) {
+        when (primaryAction) {
+            GunAction.SHOOT -> {
+                processShoot(entity)
+            }
+            else -> {}
+        }
+    }
+
+    fun processShoot(entity: LivingEntity) {
         val heldGun = entity.getPhysicalGun() ?: return
         val ticksBetweenShots = 20 / fireRate
 
         heldGun.shootingTicks += 1
-        if ((heldGun.shootingTicks % ticksBetweenShots) == 0 ||
+        if ((heldGun.shootingTicks % ticksBetweenShots) == 0f ||
             heldGun.shootingTicks == 1) {
             heldGun.lastShotTick = heldGun.shootingTicks
 
@@ -288,6 +342,73 @@ open class Gun(
                 entity
             )
         }
+    }
+
+    // TODO: combine both begin and end since their only difference is literally the fovop
+    fun processZoomBegin(player: Player) {
+        val heldGun = player.getPhysicalGun() ?: return
+
+        var fovAnimTicks = 0
+        var fov = 0f
+
+        when (secondaryAction) {
+            GunAction.ADS -> {
+                fovAnimTicks = scopedZoomTicks
+                fov = adsZoom.toFloat()
+                heldGun.isScoped = false
+                heldGun.isAds = true
+            }
+            GunAction.SCOPE -> {
+                fovAnimTicks = adsZoomTicks
+                fov = scopedZoom.toFloat()
+                heldGun.isScoped = true
+                heldGun.isAds = false
+            }
+
+            else -> {}
+        }
+
+        println("ADS=${heldGun.isAds}, SCOPED=${heldGun.isScoped}")
+        player.adjustCamera(
+            fovOp = FovOp.SUB,
+            fov = fov,
+            fovAnimTicks = fovAnimTicks,
+            lockFov = true,
+            animateFov = true
+        )
+    }
+
+    fun processZoomEnd(player: Player) {
+        val heldGun = player.getPhysicalGun() ?: return
+
+        var fovAnimTicks = 0
+        var fov = 0f
+
+        when (secondaryAction) {
+            GunAction.ADS -> {
+                fovAnimTicks = scopedZoomTicks
+                fov = adsZoom.toFloat()
+                heldGun.isScoped = false
+                heldGun.isAds = false
+            }
+            GunAction.SCOPE -> {
+                fovAnimTicks = adsZoomTicks
+                fov = scopedZoom.toFloat()
+                heldGun.isScoped = false
+                heldGun.isAds = false
+            }
+
+            else -> {}
+        }
+
+        println("ADS=${heldGun.isAds}, SCOPED=${heldGun.isScoped}")
+        player.adjustCamera(
+            fovOp = FovOp.ADD,
+            fov = fov,
+            fovAnimTicks = fovAnimTicks,
+            lockFov = true,
+            animateFov = true
+        )
     }
 
     fun onPrimaryTriggerEnd(entity: LivingEntity) {
@@ -304,37 +425,32 @@ open class Gun(
         val heldGun = entity.getPhysicalGun() ?: return
         if (heldGun.isSecondaryTriggered) return
 
-        println("begin secondary trigger")
         heldGun.isSecondaryTriggered = true
 
-        if (entity is Player) {
-            entity.adjustCamera(
-                fovOp = FovOp.SUB,
-                fov = adsZoom.toFloat(),
-                fovAnimTicks = 15,
-                lockFov = true,
-                animateFov = true
-            )
+        when (secondaryAction) {
+            GunAction.ADS, GunAction.SCOPE -> {
+                if (entity is Player)
+                    processZoomBegin(entity)
+            }
+            else -> {}
         }
     }
 
     fun onSecondaryTriggerEnd(entity: LivingEntity) {
         val heldGun = entity.getPhysicalGun() ?: return
         if (!heldGun.isSecondaryTriggered) return
-        println("end secondary trigger")
 
         heldGun.isSecondaryTriggered = false
 
-        if (entity is Player) {
-            entity.adjustCamera(
-                fovOp = FovOp.ADD,
-                fov = adsZoom.toFloat(),
-                fovAnimTicks = 15,
-                lockFov = true,
-                animateFov = true
-            )
+        when (secondaryAction) {
+            GunAction.ADS, GunAction.SCOPE -> {
+                if (entity is Player)
+                    processZoomEnd(entity)
+            }
+            else -> {}
         }
     }
+
 
     /**
      * Gets a list of raycast included/excluded entities for the sake of clean raycast shooting.
@@ -410,7 +526,8 @@ open class Gun(
 
                 val baseDir = pos.direction().normalize()
                 repeat(pelletsPerShot) {
-                    val spreadAmount = spread
+                    val spreadAmount = getCurrentSpread(heldGun)
+
                     val offsetX = (Math.random() - 0.5) * 2 * spreadAmount
                     val offsetY = (Math.random() - 0.5) * 2 * spreadAmount
                     val offsetZ = (Math.random() - 0.5) * 2 * spreadAmount
@@ -461,8 +578,6 @@ open class Gun(
         )
     }
 
-
-
     open fun displayTrail(
         pos: Pos,
         instance: Instance,
@@ -506,6 +621,14 @@ open class Gun(
             val extraDistance = distance - range
             val multiplier = (1.0 - damageDropOffMultiplier).pow(extraDistance)
             (basePerPellet * multiplier).coerceAtLeast(1.0)
+        }
+    }
+
+    fun getCurrentSpread(gun: PhysicalGun): Double {
+        return when {
+            gun.isScoped -> gun.gun.scopedSpread
+            gun.isAds -> gun.gun.adsSpread
+            else -> gun.gun.hipfireSpread
         }
     }
 }

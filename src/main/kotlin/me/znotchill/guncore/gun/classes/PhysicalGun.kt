@@ -17,4 +17,12 @@ data class PhysicalGun(
 
     var isPrimaryTriggered: Boolean = false,
     var isSecondaryTriggered: Boolean = false,
+
+    var isScoped: Boolean = false,
+    var wasScoped: Boolean = false,
+    var scopeTicks: Int = 0,
+
+    var isAds: Boolean = false,
+    var wasAds: Boolean = false,
+    var adsTicks: Int = 0
 )
