@@ -11,8 +11,7 @@ data class PhysicalGun(
     var ammoReserve: Int = gun.magazineSize,
     var gun: Gun,
     var reloading: Boolean = false,
-    var lastShotTick: Int = 0,
-    var shootingTicks: Int = 0,
+    var timeSinceShot: Float = 0f,
     val itemId: UUID,
 
     var isPrimaryTriggered: Boolean = false,

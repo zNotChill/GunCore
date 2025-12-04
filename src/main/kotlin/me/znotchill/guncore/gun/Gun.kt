@@ -307,8 +307,6 @@ open class Gun(
 
         GunCore.announce("begin primary trigger")
         heldGun.isPrimaryTriggered = true
-        heldGun.lastShotTick = 0
-        heldGun.shootingTicks = 0
 
         when (primaryAction) {
             GunAction.ADS, GunAction.SCOPE -> {
@@ -330,17 +328,14 @@ open class Gun(
 
     fun processShoot(entity: LivingEntity) {
         val heldGun = entity.getPhysicalGun() ?: return
-        val ticksBetweenShots = 20 / fireRate
 
-        heldGun.shootingTicks += 1
-        if ((heldGun.shootingTicks % ticksBetweenShots) == 0f ||
-            heldGun.shootingTicks == 1) {
-            heldGun.lastShotTick = heldGun.shootingTicks
+        val interval = 20f / fireRate
 
-            tryShoot(
-                entity.instance.players.audience,
-                entity
-            )
+        heldGun.timeSinceShot += 1f
+
+        if (heldGun.timeSinceShot >= interval || heldGun.timeSinceShot == 1f) {
+            heldGun.timeSinceShot -= interval
+            tryShoot(entity.instance.players.audience, entity)
         }
     }
 
@@ -417,8 +412,7 @@ open class Gun(
         GunCore.announce("end primary trigger")
 
         heldGun.isPrimaryTriggered = false
-        heldGun.lastShotTick = 0
-        heldGun.shootingTicks = 0
+        heldGun.timeSinceShot = 0f
     }
 
     fun onSecondaryTriggerBegin(entity: LivingEntity) {
